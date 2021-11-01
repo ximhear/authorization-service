@@ -29,7 +29,7 @@
     
     AuthorizationItem myItems[1];
      
-    char* path = "/bin/cat";
+    char* path = "/usr/bin/log";
     myItems[0].name = kAuthorizationRightExecute;
     myItems[0].valueLength = strlen(path);
     myItems[0].value = &path;
@@ -72,9 +72,15 @@
     }
     NSData* data = [NSData dataWithContentsOfFile:@"/tmp/gzonelee/hello.txt" options:0 error:nil];
     NSLog(@"%@", data);
-    char* args[] = { "/tmp/gzonelee/hello.txt", NULL };
+    char* args[] = { "show", "--last", "1m", NULL };
     FILE *outputFile;
-    OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, "/bin/cat", kAuthorizationFlagDefaults, (char**)args, &outputFile);
+    OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, path, kAuthorizationFlagDefaults, (char**)args, &outputFile);
+    if (outputFile) {
+        char sss[1024];
+        while(fgets(sss, 512, outputFile)) {
+            NSLog(@"%s", sss);
+        }
+    }
     NSLog(@"%d", s);
 
     NSTask *task = [[NSTask alloc] init];
