@@ -26,43 +26,63 @@
 -(IBAction)pressClicked:(id)sender {
     AuthorizationRef myAuthorizationRef;
     OSStatus myStatus;
-    myStatus = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,
-                kAuthorizationFlagDefaults, &myAuthorizationRef);
     
-    AuthorizationItem myItems[2];
+    AuthorizationItem myItems[1];
      
-    myItems[0].name = kAuthorizationRuleAuthenticateAsAdmin;
-    myItems[0].valueLength = 0;
-    myItems[0].value = NULL;
+    char* path = "/bin/cat";
+    myItems[0].name = kAuthorizationRightExecute;
+    myItems[0].valueLength = strlen(path);
+    myItems[0].value = &path;
     myItems[0].flags = 0;
      
-    myItems[1].name = kAuthorizationRuleClassAllow;
-    myItems[1].valueLength = 0;
-    myItems[1].value = NULL;
-    myItems[1].flags = 0;
-    
+//    myItems[1].name = kAuthorizationRightExecute;
+//    myItems[1].valueLength = 0;
+//    myItems[1].value = NULL;
+//    myItems[1].flags = 0;
+
+//    myItems[2].name = "admin";
+//    myItems[2].valueLength = 0;
+//    myItems[2].value = NULL;
+//    myItems[2].flags = 0;
+
     AuthorizationRights myRights;
     myRights.count = sizeof (myItems) / sizeof (myItems[0]);
     myRights.items = myItems;
 
     AuthorizationFlags myFlags;
     myFlags = kAuthorizationFlagDefaults |
-                kAuthorizationFlagInteractionAllowed |
+                kAuthorizationFlagInteractionAllowed | kAuthorizationFlagPreAuthorize |
                 kAuthorizationFlagExtendRights;
-    
+
+    AuthorizationRights *myAuthorizedRights = NULL;
+    myStatus = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,
+                                    kAuthorizationFlagDefaults, &myAuthorizationRef);
+    NSLog(@"myStatus : %d", myStatus);
+
 //    myStatus = AuthorizationCopyRights (myAuthorizationRef, &myRights,
 //            kAuthorizationEmptyEnvironment, myFlags, NULL);
     
-    AuthorizationRights *myAuthorizedRights;
     myStatus = AuthorizationCopyRights (myAuthorizationRef, &myRights,
                 kAuthorizationEmptyEnvironment, myFlags,
-                &myAuthorizedRights);
-    
+                NULL);
+    NSLog(@"myStatus : %d", myStatus);
+
     if ([[NSFileManager defaultManager] fileExistsAtPath:@"/tmp/gzonelee/hello.txt"] == NO) {
         NSLog(@"error - fileExists");
     }
     NSData* data = [NSData dataWithContentsOfFile:@"/tmp/gzonelee/hello.txt" options:0 error:nil];
     NSLog(@"%@", data);
+    char* args[] = { "/tmp/gzonelee/hello.txt", NULL };
+    FILE *outputFile;
+    OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, "/bin/cat", kAuthorizationFlagDefaults, (char**)args, &outputFile);
+    NSLog(@"%d", s);
+
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/log"];
+    [task setArguments:@[ @"show", @"--last",  @"1m" ]];
+    [task launch];
+    
+    
 }
 
 @end
