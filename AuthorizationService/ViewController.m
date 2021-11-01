@@ -29,13 +29,13 @@
     
     AuthorizationItem myItems[1];
      
-    char* path = "/usr/bin/log";
+    char* path = "/Applications/AhnReport.app/Contents/MacOS/ahnrpt";
     myItems[0].name = kAuthorizationRightExecute;
     myItems[0].valueLength = strlen(path);
     myItems[0].value = &path;
     myItems[0].flags = 0;
      
-//    myItems[1].name = kAuthorizationRightExecute;
+//    myItems[1].name = kAuthorizationRuleAuthenticateAsAdmin;
 //    myItems[1].valueLength = 0;
 //    myItems[1].value = NULL;
 //    myItems[1].flags = 0;
@@ -72,7 +72,7 @@
     }
     NSData* data = [NSData dataWithContentsOfFile:@"/tmp/gzonelee/hello.txt" options:0 error:nil];
     NSLog(@"%@", data);
-    char* args[] = { "show", "--last", "1m", NULL };
+    char* args[] = { NULL };
     FILE *outputFile;
     OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, path, kAuthorizationFlagDefaults, (char**)args, &outputFile);
     if (outputFile) {
