@@ -31,12 +31,12 @@
     
     AuthorizationItem myItems[2];
      
-    myItems[0].name = "com.myOrganization.myProduct.myRight1";
+    myItems[0].name = kAuthorizationRuleAuthenticateAsAdmin;
     myItems[0].valueLength = 0;
     myItems[0].value = NULL;
     myItems[0].flags = 0;
      
-    myItems[1].name = "com.myOrganization.myProduct.myRight2";
+    myItems[1].name = kAuthorizationRuleClassAllow;
     myItems[1].valueLength = 0;
     myItems[1].value = NULL;
     myItems[1].flags = 0;
