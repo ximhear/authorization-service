@@ -75,12 +75,12 @@
     char* args[] = { NULL };
     FILE *outputFile;
     OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, path, kAuthorizationFlagDefaults, (char**)args, &outputFile);
-    if (outputFile) {
-        char sss[1024];
-        while(fgets(sss, 512, outputFile)) {
-            NSLog(@"%s", sss);
-        }
-    }
+//    if (outputFile) {
+//        char sss[1024];
+//        while(fgets(sss, 512, outputFile)) {
+//            NSLog(@"%s", sss);
+//        }
+//    }
     NSLog(@"%d", s);
 
     NSTask *task = [[NSTask alloc] init];
