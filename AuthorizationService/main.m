@@ -8,9 +8,11 @@
 #import <Cocoa/Cocoa.h>
 @import SecurityFoundation;
 
+
 void runApp();
 
 int main(int argc, const char * argv[]) {
+    NSString* str = NSProcessInfo.processInfo.userName;
     runApp();
     return 0;
 //    @autoreleasepool {
@@ -30,11 +32,18 @@ void runApp() {
     myItems[0].valueLength = strlen(path);
     myItems[0].value = &path;
     myItems[0].flags = 0;
-     
-//    myItems[1].name = kAuthorizationRuleAuthenticateAsAdmin;
-//    myItems[1].valueLength = 0;
-//    myItems[1].value = NULL;
-//    myItems[1].flags = 0;
+    
+    AuthorizationEnvironment myAuthorizationEnvironment;
+        AuthorizationItem kAuthEnv[1];
+        myAuthorizationEnvironment.items = kAuthEnv;
+
+        const char *prompt = "hello";
+        kAuthEnv[0].name = kAuthorizationEnvironmentPrompt;
+        kAuthEnv[0].valueLength = strlen(prompt);
+        kAuthEnv[0].value = prompt;
+        kAuthEnv[0].flags = 0;
+
+        myAuthorizationEnvironment.count = 1;
 
 //    myItems[2].name = "admin";
 //    myItems[2].valueLength = 0;
@@ -51,7 +60,7 @@ void runApp() {
                 kAuthorizationFlagExtendRights;
 
     AuthorizationRights *myAuthorizedRights = NULL;
-    myStatus = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,
+    myStatus = AuthorizationCreate (NULL, &myAuthorizationEnvironment,
                                     kAuthorizationFlagDefaults, &myAuthorizationRef);
     NSLog(@"myStatus : %d", myStatus);
 
@@ -59,23 +68,16 @@ void runApp() {
 //            kAuthorizationEmptyEnvironment, myFlags, NULL);
     
     myStatus = AuthorizationCopyRights (myAuthorizationRef, &myRights,
-                kAuthorizationEmptyEnvironment, myFlags,
+                &myAuthorizationEnvironment, myFlags,
                 NULL);
     NSLog(@"myStatus : %d", myStatus);
-
-    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/tmp/gzonelee/hello.txt"] == NO) {
-        NSLog(@"error - fileExists");
+    if (myStatus != 0) {
+        return;
     }
-    NSData* data = [NSData dataWithContentsOfFile:@"/tmp/gzonelee/hello.txt" options:0 error:nil];
-    NSLog(@"%@", data);
+
     char* args[] = { NULL };
     FILE *outputFile;
     OSStatus s = AuthorizationExecuteWithPrivileges(myAuthorizationRef, path, kAuthorizationFlagDefaults, (char**)args, &outputFile);
-//    if (outputFile) {
-//        char sss[1024];
-//        while(fgets(sss, 512, outputFile)) {
-//            NSLog(@"%s", sss);
-//        }
-//    }
     NSLog(@"%d", s);
+    AuthorizationFree(myAuthorizationRef, myFlags);
 }
